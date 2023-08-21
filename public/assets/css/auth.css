@@ -1,0 +1,51 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700;800;900&display=swap");
+
+* {
+    font-family: "Poppins", sans-serif;
+    color: rgb(64, 64, 64);
+}
+
+.fw-medium {
+    font-weight: 500 !important;
+}
+
+/* login */
+section.login {
+    height: 100vh !important;
+}
+
+section.login .right {
+    /* background-color: rgb(250, 250, 250) !important; */
+    background: url("/assets/images/bg/bglogin.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+section.login .right::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.line {
+    width: 40%;
+    height: 2px;
+    border: 1px solid rgb(214, 209, 209);
+}
+
+.icon-btn {
+    width: 30px;
+    object-fit: cover;
+}
+
+/* register */
+
+section.register {
+    background-color: rgb(243, 243, 243) !important;
+    height: 100vh !important;
+}
