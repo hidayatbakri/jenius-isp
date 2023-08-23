@@ -7,6 +7,7 @@ use App\Http\Controllers\OltController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RouterController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ToolsController;
 use App\Http\Livewire\DataMikrotik;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
@@ -37,8 +38,11 @@ Route::middleware(['checkLevel:admin'])->group(function () {
   Route::get('/admin', [CustomerController::class, 'index']);
   Route::get('/home', [AdminController::class, 'index']);
   Route::resource('/admin/router', RouterController::class);
+  Route::get('/admin/customers/map', [CustomerController::class, 'map']);
   Route::resource('/admin/customers', CustomerController::class);
   Route::resource('/admin/olt', OltController::class);
+  Route::get('/admin/tools/map', [ToolsController::class, 'map']);
+  Route::resource('/admin/tools', ToolsController::class);
   Route::put('/admin/olt/setActive/{id}', [OltController::class, 'setActive']);
 
   // Route onu

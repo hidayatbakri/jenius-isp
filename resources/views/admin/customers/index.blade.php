@@ -65,6 +65,9 @@
         <h4>Daftar Pelanggan</h4>
       </div>
       <div class="card-body">
+        <div class="list-link mb-4">
+          <a href="/admin/customers/map" class="btn btn-primary">Lokasi Pelanggan</a>
+        </div>
         <div class="table-responsive table-invoice">
 
           <livewire:transaction-data />

@@ -50,7 +50,7 @@
                 <tr>
                   <td>Alamat</td>
                   <td>:</td>
-                  <td>{{$customer->address}}</td>
+                  <td>{{$customer->address}} ( <a target="_blank" href="https://google.com/maps/place/{{$customer->latitude}},{{ $customer->longitude }}">Map <i class="fas fa-external-link-alt px-1"></i></a> )</td>
                 </tr>
                 <tr>
                   <td>Foto Ktp</td>

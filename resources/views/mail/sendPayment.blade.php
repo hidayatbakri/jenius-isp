@@ -38,7 +38,7 @@
     <tr>
       <td>Harga</td>
       <td>: </td>
-      <td>Rp. {{ number_format($data_email['price'],0,".",".") }}</td>
+      <td>Rp. {{ number_format(($data_email['price'] + $data_email['biayaAdmin']),0,".",".") }}</td>
     </tr>
     <tr>
       <td>Biaya Admin</td>

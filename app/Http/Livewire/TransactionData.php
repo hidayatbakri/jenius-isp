@@ -63,13 +63,16 @@ class TransactionData extends Component
                 foreach ($data[$row->customer->onu] as $pd) {
                     if ($pd['tx'] > 6.980 || $pd['rx'] < -13.224) {
                         $textReport = "
-**Informasi Gangguan**
+⚠Informasi Gangguan⚠
 Nama Pelanggan : " . $row->customer->name . "
 Onu : " . $row->customer->onu . "
 Olt : " . $getactiveolt->name . "
+Sn : " . $row->customer->sn . "
 Telepon : " . $row->customer->hp . "
 TX : " . $pd['tx'] . "
 RX : " . $pd['rx'] . "
+Reason : Tes
+Lokasi (map) : https://google.com/maps/place/" . $row->customer->latitude . "," . $row->customer->longitude . "
 ";
                         $telegramApi->sendMessage($textReport);
                     }

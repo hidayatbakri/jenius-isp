@@ -14,6 +14,9 @@
   <link rel="stylesheet" href="/assets/css/custom.css">
   <link rel='shortcut icon' type='image/x-icon' href='/assets/img/favicon.ico' />
   <link href="/assets/DataTables/datatables.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
 
   <script src="/assets/js/jQuery.min.js"></script>
   <!-- General JS Scripts -->
@@ -206,10 +209,10 @@
             <li class="dropdown {{ $activeLink == 'dashboard' ? 'active' : '' }}">
               <a href="#" class="nav-link has-dropdown"><i class="fas fa-home"></i><span>Dashboard</span></a>
               <ul class="dropdown-menu">
-                <li><a class="nav-link" href="/admin">Home</a></li>
+                <li><a class="nav-link" href="/admin">Pelanggan</a></li>
                 <li><a class="nav-link" href="/admin/olt">OLT</a></li>
                 <li><a class="nav-link" href="/admin/listonu">Pendaftaran</a></li>
-                <li><a class="nav-link" href="/admin/alat">Alat</a></li>
+                <li><a class="nav-link" href="/admin/tools">Alat</a></li>
                 <!-- <li><a class="nav-link" href="/admin/pendaftaran">Pendaftaran</a></li> -->
               </ul>
             </li>

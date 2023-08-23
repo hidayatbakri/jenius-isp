@@ -23,7 +23,10 @@ return new class extends Migration
             $table->string('nik');
             $table->string('foto_ktp');
             $table->string('address');
+            $table->string('latitude');
+            $table->string('longitude');
             $table->string('sn')->nullable();
+            $table->string('password');
             $table->date('active')->nullable();
             $table->date('expire')->nullable();
             $table->timestamps();

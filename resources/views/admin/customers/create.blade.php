@@ -24,8 +24,8 @@
               </div>
               <div class="form-group">
                 <label for="type">Serial Number:</label>
-                <input type="text" class="form-control @error('sn') is-invalid @enderror" name="sn" id="sn" value="{{ $sn }}">
-                @error('type')
+                <input type="text" class=" form-control @error('sn') is-invalid @enderror" name="sn" id="sn" value="{{ $sn }}">
+                @error('sn')
                 <div id="validationServer04Feedback" class="invalid-feedback">
                   {{$message}}
                 </div>
@@ -44,17 +44,26 @@
                 @enderror
               </div>
               <div class="form-group">
-                <label for="paket">Paket:</label>
-                <select name="paket" id="paket" class="form-control">
-                  @foreach($paket as $pkt)
-                  <option value="{{ $pkt->id }}">{{ $pkt->speed }}Mbps</option>
-                  @endforeach
-                </select>
-                @error('type')
+                <label for="name">Username:</label>
+                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" value="{{ old('name') }}">
+                @error('name')
                 <div id="validationServer04Feedback" class="invalid-feedback">
                   {{$message}}
                 </div>
                 @enderror
+              </div>
+              <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" value="{{ old('password') }}">
+                @error('password')
+                <div id="validationServer04Feedback" class="invalid-feedback">
+                  {{$message}}
+                </div>
+                @enderror
+                <div class="form-group mt-2">
+                  <input type="checkbox" id="showPass">
+                  <label for="showPass"> Tampilkan password</label>
+                </div>
               </div>
               <div class="form-group">
                 <label for="vlan">Vlan:</label>
@@ -74,22 +83,18 @@
                 </div>
                 @enderror
               </div>
-              <div class="form-group">
-                <label for="ppoepassword">PPOE Password:</label>
-                <input type="password" class="form-control @error('ppoepassword') is-invalid @enderror" name="ppoepassword" id="ppoepassword">
-                @error('ppoepassword')
-                <div id="validationServer04Feedback" class="invalid-feedback">
-                  {{$message}}
-                </div>
-                @enderror
-              </div>
+
 
             </div>
             <div class="col-md-6 col-sm-12">
               <div class="form-group">
-                <label for="name">Username:</label>
-                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" value="{{ old('name') }}">
-                @error('name')
+                <label for="paket">Paket:</label>
+                <select name="paket" id="paket" class="form-control">
+                  @foreach($paket as $pkt)
+                  <option value="{{ $pkt->id }}">{{ $pkt->speed }}Mbps</option>
+                  @endforeach
+                </select>
+                @error('type')
                 <div id="validationServer04Feedback" class="invalid-feedback">
                   {{$message}}
                 </div>
@@ -132,15 +137,6 @@
                 @enderror
               </div>
               <div class="form-group">
-                <label for="password">Wifi Password:</label>
-                <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password">
-                @error('password')
-                <div id="validationServer04Feedback" class="invalid-feedback">
-                  {{$message}}
-                </div>
-                @enderror
-              </div>
-              <div class="form-group">
                 <label for="address">Alamat:</label>
                 <textarea name="address" class="form-control" id="address"></textarea>
                 @error('hp')
@@ -148,6 +144,27 @@
                   {{$message}}
                 </div>
                 @enderror
+              </div>
+              <div class="form-group">
+                <label for="latitude">Lokasi (map):</label>
+                <div class="row">
+                  <div class="col-6">
+                    <input type="text" placeholder="Latitude" class="form-control @error('latitude') is-invalid @enderror" name="latitude" id="latitude" value="{{ old('latitude') }}">
+                    @error('latitude')
+                    <div id="validationServer04Feedback" class="invalid-feedback">
+                      {{$message}}
+                    </div>
+                    @enderror
+                  </div>
+                  <div class="col-6">
+                    <input type="text" placeholder="Longitude" class="form-control @error('longitude') is-invalid @enderror" name="longitude" id="longitude" value="{{ old('longitude') }}">
+                    @error('longitude')
+                    <div id="validationServer04Feedback" class="invalid-feedback">
+                      {{$message}}
+                    </div>
+                    @enderror
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -161,6 +178,17 @@
     </div>
   </div>
 </div>
+
+<script>
+  $('#name').on('keyup', function(e) {
+    let cleanedString = $(this).val().replace(/[^a-zA-Z0-9]/g, '');
+    $('#password').val(cleanedString.toLowerCase() + $('#sn').val());
+  })
+
+  $('#showPass').on('click', function() {
+    $('#password').attr('type', $('#password').attr("type") == 'password' ? 'text' : 'password')
+  })
+</script>
 @if (@session('error'))
 <script>
   Swal.fire({

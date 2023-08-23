@@ -29,9 +29,8 @@ class CustomerController extends Controller
         $clientExp = $customers->filter(function ($customer) {
             return empty($customer->expire);
         })->count();
-        // dd($customers);
 
-        return view('admin.pendaftaran', compact('title', 'activeLink', 'customers', 'clientExp'));
+        return view('admin.customers.index', compact('title', 'activeLink', 'customers', 'clientExp'));
     }
 
 
@@ -62,7 +61,7 @@ class CustomerController extends Controller
                 $availablePort = Telnet::setOltPort($dataOlt, $index[0]);
             }
         }
-        return view('admin.addPendaftaran', compact('title', 'activeLink', 'paket', 'dataOlt', 'availablePort', 'sn'));
+        return view('admin.customers.create', compact('title', 'activeLink', 'paket', 'dataOlt', 'availablePort', 'sn'));
     }
 
     /**
@@ -80,8 +79,12 @@ class CustomerController extends Controller
             'paket' => 'required',
             'email' => 'required|email:dns',
             'hp' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
             'address' => 'required',
+            'password' => 'required',
         ]);
+
 
         $requestValidate['foto_ktp'] = $request->file('foto_ktp')->store('ktp');
         $customerid = rand(1, 9999999999);
@@ -120,7 +123,7 @@ service-port 1 description ' . $request->vlan  . '
 !
 pon-onu-mng gpon-onu_' . $request->onu  . '
 service Internet gemport 1 vlan ' . $request->vlan  . '
-wan-ip 1 mode pppoe username @' . $oltName  . ' password ' . $request->ppoepassword . ' vlan-profile ' . $request->vlanprofile  . ' host 1
+wan-ip 1 mode pppoe username @' . $oltName  . ' password ' . $request->password . ' vlan-profile ' . $request->vlanprofile  . ' host 1
 wan-ip 1 ping-response enable traceroute-response enable
 interface wifi wifi_0/1 state unlock
 ssid ctrl wifi_0/1 name HOME-WIFI-1
@@ -156,7 +159,7 @@ wan 1 ethuni 1 ssid 1 service internet host 1
                 'status_code' => 201,
                 'transaction_id' => '',
                 'order_id' => $orderId,
-                'gross_amount' => $paket->price,
+                'gross_amount' => ($paket->price + $$biayaAdmin->biaya_admin),
                 'payment_type' => '',
                 'transaction_code' => '',
                 'paymentlink' => $paymentLinkId,
@@ -180,52 +183,6 @@ wan 1 ethuni 1 ssid 1 service internet host 1
         return redirect('/admin/customers/create')->with('error', 'Tidak ada koneksi ke OLT');
     }
 
-    public function sendTelnetData()
-    {
-        $host = 'sg1.fazznet.co.id';
-        $port = 12970;
-        $username = 'admin';
-        $password = 'Rdp123!!';
-        $data = "show gpon onu uncfg";
-        // $data = "config t interface gpon-olt_1/1/2:2 onu 2 type ZTEG-F609 sn ZTEGC1C8D0DF ! ...";
-
-        $socket = fsockopen($host, $port, $errorNumber, $errorString);
-
-        if (!$socket) {
-            return "Connection failed: $errorString ($errorNumber)";
-        }
-
-        $response = '';
-
-        // Read initial response
-        while (!feof($socket)) {
-            $response .= fgets($socket, 4096);
-            if (strpos($response, 'login:') !== false) {
-                break;
-            }
-        }
-
-        // Send username
-        fwrite($socket, "$username\r\n");
-        $response .= fgets($socket, 4096);
-
-        // Send password
-        fwrite($socket, "$password\r\n");
-        $response .= fgets($socket, 4096);
-
-        // Send data
-        fwrite($socket, $data);
-
-        // Read response
-        while (!feof($socket)) {
-            $response .= fgets($socket, 4096);
-        }
-
-        fclose($socket);
-
-        return "Response from server: $response";
-    }
-
     /**
      * Display the specified resource.
      */
@@ -240,7 +197,7 @@ wan 1 ethuni 1 ssid 1 service internet host 1
             ->rightJoin('paket', 'paket.id', '=', 'customers.paket')
             ->where('paket.id', $customer->paket)
             ->first();
-        return view('admin.pendaftaranDetail', compact('title', 'activeLink', 'customers', 'customer'));
+        return view('admin.customers.detailCustomer', compact('title', 'activeLink', 'customers', 'customer'));
     }
 
     /**
@@ -265,5 +222,16 @@ wan 1 ethuni 1 ssid 1 service internet host 1
     public function destroy(Customer $customer)
     {
         //
+    }
+
+    public function map()
+    {
+        $title = 'Pelanggan | Jenius';
+        $activeLink = 'dashboard';
+
+        $olt = Olt::where('status', 1)->first();
+        $customers = Customer::where('olt_id', $olt->id)->get();
+        $customers = json_encode($customers);
+        return view('admin.customers.map', compact('title', 'activeLink', 'customers'));
     }
 }
