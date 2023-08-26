@@ -19,6 +19,7 @@ class OltController extends Controller
         $title = 'Olt | Jenius';
         $activeLink = 'dashboard';
         $telnet = new Telnet();
+        $status = false;
 
         $getactiveolt = Olt::where('status', 1)->first();
         // dd($getactiveolt);
