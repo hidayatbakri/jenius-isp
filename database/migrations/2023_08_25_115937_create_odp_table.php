@@ -11,9 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('_api_tokens', function (Blueprint $table) {
+        Schema::create('odp', function (Blueprint $table) {
             $table->id();
-            $table->string("api_token");
+            $table->foreignId('odc_id');
+            $table->string("name");
+            $table->string("head");
+            $table->string("address");
+            $table->string("description");
+            $table->string("foto");
+            $table->string("latitude");
+            $table->string("longitude");
             $table->timestamps();
         });
     }
@@ -23,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('_api_tokens');
+        Schema::dropIfExists('odp');
     }
 };

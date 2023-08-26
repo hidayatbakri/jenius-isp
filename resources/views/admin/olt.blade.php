@@ -37,7 +37,7 @@
                 <td>{{ $row->host }}</td>
                 <td>{{ $row->user }}</td>
                 <td>{{ $row->port }}</td>
-                <td class="{{ $row->status ? 'text-success' : '' }}">{{ $row->status ? 'Tersambung' : 'Terputus' }}</td>
+                <td class="{{ $status ? 'text-success' : '' }}">{{ $status ? 'Tersambung' : 'Terputus' }}</td>
                 <td>
                   <div class="d-flex">
 

@@ -19,8 +19,7 @@
       <td>{{ $tableRow->customer->active ?? '' }}</td>
       <td>{{ $tableRow->customer->expire ?? '' }}</td>
       <td>
-        @if($tableRow->customer->expire <= $now && $tableRow->customer->expire == null)
-          <span class="text-warning">Tidak Aktif</span>
+        @if($tableRow->customer->expire == null && $tableRow->customer->expire <= $now) <span class="text-warning">Tidak Aktif</span>
           @else
           <span class="text-success">Aktif</span>
           @endif

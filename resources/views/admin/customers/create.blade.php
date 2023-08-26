@@ -44,6 +44,19 @@
                 @enderror
               </div>
               <div class="form-group">
+                <label for="odp_id">Odp:</label>
+                <select name="odp_id" id="odp_id" class="form-control @error('odp_id') is-invalid @enderror">
+                  @foreach($odp as $rowodp)
+                  <option value="{{ $rowodp->id }}">{{ $rowodp->name }}Mbps</option>
+                  @endforeach
+                </select>
+                @error('odp_id')
+                <div id="validationServer04Feedback" class="invalid-feedback">
+                  {{$message}}
+                </div>
+                @enderror
+              </div>
+              <div class="form-group">
                 <label for="name">Username:</label>
                 <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" value="{{ old('name') }}">
                 @error('name')
@@ -88,13 +101,13 @@
             </div>
             <div class="col-md-6 col-sm-12">
               <div class="form-group">
-                <label for="paket">Paket:</label>
-                <select name="paket" id="paket" class="form-control">
+                <label for="paket_id">Paket:</label>
+                <select name="paket_id" id="paket_id" class="form-control">
                   @foreach($paket as $pkt)
                   <option value="{{ $pkt->id }}">{{ $pkt->speed }}Mbps</option>
                   @endforeach
                 </select>
-                @error('type')
+                @error('paket')
                 <div id="validationServer04Feedback" class="invalid-feedback">
                   {{$message}}
                 </div>
@@ -138,8 +151,8 @@
               </div>
               <div class="form-group">
                 <label for="address">Alamat:</label>
-                <textarea name="address" class="form-control" id="address"></textarea>
-                @error('hp')
+                <textarea name="address" class="form-control @error('address') is-invalid @enderror" id="address">{{ @old('address') }}</textarea>
+                @error('alamat')
                 <div id="validationServer04Feedback" class="invalid-feedback">
                   {{$message}}
                 </div>

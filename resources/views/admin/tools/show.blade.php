@@ -21,7 +21,12 @@
           <li class="list-group-item"><b>Nama</b> : {{ $tool->name }}</li>
           <li class="list-group-item"><b>Head</b> : {{ $tool->head }}</li>
           <li class="list-group-item"><b>Address</b> : {{ $tool->address }}</li>
+          @if(isset($tool->odc_id))
+          <li class="list-group-item"><b>Odc (Connect to)</b> : {{ $tool->odc->name }}</li>
+          @endif
           <li class="list-group-item"><b>Description</b> : {{ $tool->description }}</li>
+          <li class="list-group-item"><b>Map</b> : <td>Buka <a target="_blank" href="https://google.com/maps/place/{{ $tool->latitude }},{{ $tool->longitude }}"><i class="fas fa-external-link-alt px-1"></i></a></td>
+          </li>
         </ul>
         <div class="d-flex justify-content-end mt-3">
           <a href="/admin/tools" class="btn btn-primary">Kembali</a>

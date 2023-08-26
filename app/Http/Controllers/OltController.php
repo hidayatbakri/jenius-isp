@@ -22,23 +22,16 @@ class OltController extends Controller
 
         $getactiveolt = Olt::where('status', 1)->first();
         // dd($getactiveolt);
-        // $result = $telnet->Connect($getactiveolt->host, $getactiveolt->user, $getactiveolt->password, $getactiveolt->port);
-        // if ($result == 0) {
-        //     $output = $telnet->runCommand('show gpon onu state');
-        //     $data = $processedData = Telnet::processOutput($output);
-        //     // dd($data);
-        // }
+        if ($getactiveolt != null) {
+            $result = $telnet->Connect($getactiveolt->host, $getactiveolt->user, $getactiveolt->password, $getactiveolt->port);
+            if ($result == 0) {
+                $status = true;
+            } else {
+                $status = false;
+            }
+        }
 
-
-        return view('admin.olt', compact('title', 'activeLink', 'olt'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return view('admin.olt', compact('title', 'activeLink', 'olt', 'status'));
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Paket;
+use App\Models\TelegramApi;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -39,7 +41,7 @@ class PaymentController extends Controller
         $originalDate = $data->settlement_time;
         $carbonDate = Carbon::parse($originalDate);
 
-        $oneMonthLater = $carbonDate->addDay(); // Tambahkan satu bulan
+        $oneMonthLater = $carbonDate->addMonth(); // Tambahkan satu bulan
         $oneMonthLaterFormatted = $oneMonthLater->format('Y-m-d H:i:s');
 
         $transaction = Transaction::where('order_id', $order_id)->first();
@@ -47,7 +49,20 @@ class PaymentController extends Controller
             'active' => $data->settlement_time,
             'expire' => $oneMonthLaterFormatted
         ]);
-
+        $customer = Customer::with('paket')->where('id', $transaction->customer_id)->first();
+        $telegramApi = new TelegramApi;
+        $textReport = "
+📢 Informasi Pelanggan 📢
+Nama Pelanggan : " . $customer->name . "
+Onu : " . $customer->onu . "
+Sn : " . $customer->sn . "
+Telepon : " . $customer->hp . "
+Paket : " . $customer->paket->speed . "
+Bayar : Rp. " . number_format($transaction->gross_amount, 0, '.', '.') . "
+Status : " . $data->status_code == 200 ? 'Dibayar' : '-' . "
+Lokasi (map) : https://google.com/maps/place/" . $customer->latitude . "," . $customer->longitude . "
+        ";
+        $telegramApi->sendMessage($textReport);
         $response = Http::withBasicAuth("SB-Mid-server-m9r2dUIe58EggFEyTflF8orC:", "")
             ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
             ->delete('https://api.sandbox.midtrans.com/v1/payment-links/' . $data->order_id);

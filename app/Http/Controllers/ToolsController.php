@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Odc;
+use App\Models\Odp;
 use App\Models\Tool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -15,8 +17,9 @@ class ToolsController extends Controller
     {
         $title = 'Alat | Jenius';
         $activeLink = 'dashboard';
-        $tools = Tool::all();
-        return view('admin.tools.index', compact('title', 'activeLink', 'tools'));
+        $odc = Odc::all();
+        $odp = Odp::with('odc')->get();
+        return view('admin.tools.index', compact('title', 'activeLink', 'odc', 'odp'));
     }
 
     /**
@@ -41,8 +44,14 @@ class ToolsController extends Controller
             'foto' => 'required|max:516|mimes:jpg,jpeg,png',
         ]);
         $requestValidate['foto'] = $request->file('foto')->store('alat');
-
-        Tool::create($requestValidate);
+        if ($request->type == 1) {
+            Odc::create($requestValidate);
+        } elseif ($request->type == 0) {
+            $requestValidate['odc_id'] = $request->odp;
+            Odp::create($requestValidate);
+        } else {
+            return redirect()->back();
+        }
 
         return redirect()->back()->with('success', 'Berhasil menambahkan data');
     }
@@ -102,8 +111,9 @@ class ToolsController extends Controller
     {
         $title = 'Lokasi Alat | Jenius';
         $activeLink = 'dashboard';
-        $tools = Tool::all();
+        $tools = Odc::with('odp')->get();
         $tools = json_encode($tools);
+        // dd($tools);
         return view('admin.tools.map', compact('title', 'activeLink', 'tools'));
     }
 }

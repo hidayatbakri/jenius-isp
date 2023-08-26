@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('olt_id');
-            $table->foreignId('paket');
+            $table->foreignId('odp_id');
+            $table->foreignId('paket_id');
             $table->string('onu')->unique("onu");
             $table->string('name');
             $table->string('type');

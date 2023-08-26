@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\SendEmail;
 use App\Models\Customer;
+use App\Models\Odp;
 use App\Models\Olt;
 use App\Models\Paket;
 use App\Models\Telnet;
@@ -24,13 +25,13 @@ class CustomerController extends Controller
 
         $title = 'Pelanggan | Jenius';
         $activeLink = 'dashboard';
-        $customers = Customer::all();
+        $customersCalc = Customer::all();
 
-        $clientExp = $customers->filter(function ($customer) {
+        $clientExp = $customersCalc->filter(function ($customer) {
             return empty($customer->expire);
         })->count();
 
-        return view('admin.customers.index', compact('title', 'activeLink', 'customers', 'clientExp'));
+        return view('admin.customers.index', compact('title', 'activeLink', 'customersCalc', 'clientExp'));
     }
 
 
@@ -42,6 +43,7 @@ class CustomerController extends Controller
         $title = 'Pelanggan | Jenius';
         $activeLink = 'dashboard';
         $paket = Paket::all();
+        $odp = Odp::all();
         $dataOlt = [];
         $availablePort = '';
         $sn = $request->get('getSn');
@@ -61,7 +63,7 @@ class CustomerController extends Controller
                 $availablePort = Telnet::setOltPort($dataOlt, $index[0]);
             }
         }
-        return view('admin.customers.create', compact('title', 'activeLink', 'paket', 'dataOlt', 'availablePort', 'sn'));
+        return view('admin.customers.create', compact('title', 'activeLink', 'paket', 'dataOlt', 'availablePort', 'sn', 'odp'));
     }
 
     /**
@@ -72,11 +74,12 @@ class CustomerController extends Controller
         $requestValidate = $request->validate([
             'onu' => 'required|unique:customers',
             'sn' => 'required',
+            'odp_id' => 'required',
             'nik' => 'required|integer|unique:customers',
             'foto_ktp' => 'required|mimes:jpg,jpeg,png|max:512|file',
             'name' => 'required',
             'type' => 'required',
-            'paket' => 'required',
+            'paket_id' => 'required',
             'email' => 'required|email:dns',
             'hp' => 'required',
             'latitude' => 'required',
@@ -95,7 +98,7 @@ class CustomerController extends Controller
         $requestValidate['id'] = $customerid;
         $requestValidate['olt_id'] = $getactiveolt->id;
 
-        $paket = Paket::where('id', $request->paket)->first();
+        $paket = Paket::where('id', $request->paket_id)->first();
         $telnet = new Telnet();
         if ($getactiveolt != null) {
             $result = $telnet->Connect($getactiveolt->host, $getactiveolt->user, $getactiveolt->password, $getactiveolt->port);
@@ -159,7 +162,7 @@ wan 1 ethuni 1 ssid 1 service internet host 1
                 'status_code' => 201,
                 'transaction_id' => '',
                 'order_id' => $orderId,
-                'gross_amount' => ($paket->price + $$biayaAdmin->biaya_admin),
+                'gross_amount' => ($paket->price + $biayaAdmin->biaya_admin),
                 'payment_type' => '',
                 'transaction_code' => '',
                 'paymentlink' => $paymentLinkId,
@@ -190,12 +193,10 @@ wan 1 ethuni 1 ssid 1 service internet host 1
     {
         $title = 'Pelanggan | Jenius';
         $activeLink = 'dashboard';
-
-
         $customers = Customer::with('transactions')->where('id', $customer->id)->get();
         $customer = DB::table('customers')
-            ->rightJoin('paket', 'paket.id', '=', 'customers.paket')
-            ->where('paket.id', $customer->paket)
+            ->rightJoin('paket', 'paket.id', '=', 'customers.paket_id')
+            ->where('paket.id', $customer->paket_id)
             ->first();
         return view('admin.customers.detailCustomer', compact('title', 'activeLink', 'customers', 'customer'));
     }
@@ -230,7 +231,8 @@ wan 1 ethuni 1 ssid 1 service internet host 1
         $activeLink = 'dashboard';
 
         $olt = Olt::where('status', 1)->first();
-        $customers = Customer::where('olt_id', $olt->id)->get();
+        $customers = Customer::with('odp')->where('olt_id', $olt->id ?? 0)->get();
+
         $customers = json_encode($customers);
         return view('admin.customers.map', compact('title', 'activeLink', 'customers'));
     }

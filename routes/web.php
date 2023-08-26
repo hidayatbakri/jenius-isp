@@ -3,6 +3,8 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\OdcController;
+use App\Http\Controllers\OdpController;
 use App\Http\Controllers\OltController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RouterController;
@@ -43,6 +45,8 @@ Route::middleware(['checkLevel:admin'])->group(function () {
   Route::resource('/admin/olt', OltController::class);
   Route::get('/admin/tools/map', [ToolsController::class, 'map']);
   Route::resource('/admin/tools', ToolsController::class);
+  Route::resource('/admin/odp', OdpController::class);
+  Route::resource('/admin/odc', OdcController::class);
   Route::put('/admin/olt/setActive/{id}', [OltController::class, 'setActive']);
 
   // Route onu

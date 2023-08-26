@@ -28,7 +28,7 @@
         <div class="row">
           <div class="col">
             <h6 class="text-muted mb-0">Client PPOE</h6>
-            <span class="fw-bold mb-0">{{ count($customers) }}</span>
+            <span class="fw-bold mb-0">{{ count($customersCalc) }}</span>
           </div>
           <div class="col-auto">
             <div class="card-circle l-bg-cyan text-white">
@@ -45,7 +45,7 @@
         <div class="row">
           <div class="col">
             <h6 class="text-muted mb-0">Onu Uncfg</h6>
-            <span class="fw-bold mb-0">{{ count($customers) }}</span>
+            <span class="fw-bold mb-0">{{ count($customersCalc) }}</span>
           </div>
           <div class="col-auto">
             <div class="card-circle l-bg-red text-white">

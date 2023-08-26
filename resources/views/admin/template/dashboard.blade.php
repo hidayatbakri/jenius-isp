@@ -370,6 +370,9 @@
     const editModal = new bootstrap.Modal('#editModal', {
       backdrop: false
     })
+    const moreModal = new bootstrap.Modal('#moreModal', {
+      backdrop: false
+    })
   </script>
 </body>
 

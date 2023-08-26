@@ -18,8 +18,17 @@
   .marker {
     background-image: url("/assets/img/marker.png");
     background-size: cover;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .marker2 {
+    background-image: url("/assets/img/marker2.png");
+    background-size: cover;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     cursor: pointer;
   }
@@ -62,6 +71,7 @@
 
 <script>
   const data = JSON.parse(@json($tools));
+  let dataodp = [];
   mapboxgl.accessToken =
     "pk.eyJ1IjoibWhtbWRkYXJ5bDExMCIsImEiOiJjbGxsbTJvYXQxcjJsM2xuczFheGhvYnd2In0.snzr5dOuhxwndWXQi8Tfog";
 
@@ -80,6 +90,7 @@
       name,
       address,
       id,
+      odp,
     } = item;
 
     const geojsonFeature = {
@@ -94,15 +105,47 @@
         id: id,
       },
     };
+    odp.push({
+      'odc': name
+    })
+    dataodp.push(odp);
     features.push(geojsonFeature);
   });
+
 
   const geojson = {
     type: "FeatureCollection",
     features: features,
   };
 
-  console.log(geojson);
+  const features2 = [];
+  for (let i = 0; i < dataodp.length; i++) {
+    if (dataodp[i].length > 1) {
+      let getodp = dataodp[i][0]
+      let getodc = dataodp[i][1]
+      const geojsonFeature2 = {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [parseFloat(getodp.longitude), parseFloat(getodp.latitude)],
+        },
+        properties: {
+          title: getodp.name,
+          address: getodp.address,
+          odc: getodc.odc,
+          id: getodp.id,
+        },
+      };
+      features2.push(geojsonFeature2);
+    }
+  }
+
+  const geojson2 = {
+    type: "FeatureCollection",
+    features: features2,
+  };
+
+
 
   for (const feature of geojson.features) {
     // create a HTML element for each feature
@@ -121,6 +164,31 @@
             <li class="list-group-item">Nama : ${feature.properties.title}</li>
             <li class="list-group-item">Alamat : ${feature.properties.address}</li>
             <li class="list-group-item">Detail : <a href="/admin/customers/${feature.properties.id}">Buka <i class="fas fa-external-link-alt px-1"></i></a></li>
+          </ul>
+          `
+        )
+      )
+      .addTo(map);
+  }
+
+  for (const feature2 of geojson2.features) {
+    // create a HTML element for each feature2
+    const el = document.createElement("div");
+    el.className = "marker2";
+
+    new mapboxgl.Marker(el)
+      .setLngLat(feature2.geometry.coordinates)
+      .setPopup(
+        new mapboxgl.Popup({
+          offset: 25
+        }) // add popups
+        .setHTML(
+          `
+          <ul class="list-group list-group-flush ">
+            <li class="list-group-item">Nama : ${feature2.properties.title}</li>
+            <li class="list-group-item">Alamat : ${feature2.properties.address}</li>
+            <li class="list-group-item">Odc : ${feature2.properties.odc}</li>
+            <li class="list-group-item">Detail : <a href="/admin/customers/${feature2.properties.id}">Buka <i class="fas fa-external-link-alt px-1"></i></a></li>
           </ul>
           `
         )

@@ -62,6 +62,7 @@
 
 <script>
   const data = JSON.parse(@json($customers));
+  let dataodp = [];
   mapboxgl.accessToken =
     "pk.eyJ1IjoibWhtbWRkYXJ5bDExMCIsImEiOiJjbGxsbTJvYXQxcjJsM2xuczFheGhvYnd2In0.snzr5dOuhxwndWXQi8Tfog";
 
@@ -80,6 +81,7 @@
       name,
       address,
       id,
+      odp,
       hp,
     } = item;
 
@@ -93,6 +95,7 @@
         title: name,
         address: address,
         id: id,
+        odp: odp.name,
         hp: hp,
       },
     };
@@ -104,7 +107,7 @@
     features: features,
   };
 
-  console.log(geojson);
+
 
   for (const feature of geojson.features) {
     // create a HTML element for each feature
@@ -123,6 +126,7 @@
             <li class="list-group-item">Nama : ${feature.properties.title}</li>
             <li class="list-group-item">Alamat : ${feature.properties.address}</li>
             <li class="list-group-item">Hp : ${feature.properties.hp}</li>
+            <li class="list-group-item">Odp : ${feature.properties.odp}</li>
             <li class="list-group-item">Detail : <a href="/admin/customers/${feature.properties.id}">Buka <i class="fas fa-external-link-alt px-1"></i></a></li>
           </ul>
           `

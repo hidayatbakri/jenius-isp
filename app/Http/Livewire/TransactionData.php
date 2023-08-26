@@ -24,8 +24,9 @@ class TransactionData extends Component
     public function mount()
     {
         $this->getactiveolt = Olt::where('status', 1)->first();
-        $customers = Transaction::with('customer')->where('olt_id', $this->getactiveolt->id)->groupBy('customer_id')->get();
+        $customers = Transaction::with('customer')->where('olt_id', $this->getactiveolt->id ?? 0)->groupBy('customer_id')->get();
         $this->customers =  $customers;
+        // dd($customers);
     }
 
     public function render()
@@ -37,7 +38,7 @@ class TransactionData extends Component
 
     public function getData()
     {
-        $customers = Transaction::with('customer')->where('olt_id', $this->getactiveolt->id)->groupBy('customer_id')->get();
+        $customers = Transaction::with('customer')->where('olt_id', $this->getactiveolt->id ?? 0)->groupBy('customer_id')->get();
         $this->customers =  $customers;
     }
 
@@ -57,28 +58,28 @@ class TransactionData extends Component
         $this->dataPower = $data;
 
         // $textReport = '';
-        $telegramApi = new TelegramApi;
-        foreach ($this->customers as $row) {
-            if (isset($data[$row->customer->onu]) != null) {
-                foreach ($data[$row->customer->onu] as $pd) {
-                    if ($pd['tx'] > 6.980 || $pd['rx'] < -13.224) {
-                        $textReport = "
-⚠Informasi Gangguan⚠
-Nama Pelanggan : " . $row->customer->name . "
-Onu : " . $row->customer->onu . "
-Olt : " . $getactiveolt->name . "
-Sn : " . $row->customer->sn . "
-Telepon : " . $row->customer->hp . "
-TX : " . $pd['tx'] . "
-RX : " . $pd['rx'] . "
-Reason : Tes
-Lokasi (map) : https://google.com/maps/place/" . $row->customer->latitude . "," . $row->customer->longitude . "
-";
-                        $telegramApi->sendMessage($textReport);
-                    }
-                }
-            }
-        }
+        //         $telegramApi = new TelegramApi;
+        //         foreach ($this->customers as $row) {
+        //             if (isset($data[$row->customer->onu]) != null) {
+        //                 foreach ($data[$row->customer->onu] as $pd) {
+        //                     if ($pd['tx'] > 6.980 || $pd['rx'] < -13.224) {
+        //                         $textReport = "
+        // ⚠Informasi Gangguan⚠
+        // Nama Pelanggan : " . $row->customer->name . "
+        // Onu : " . $row->customer->onu . "
+        // Olt : " . $getactiveolt->name . "
+        // Sn : " . $row->customer->sn . "
+        // Telepon : " . $row->customer->hp . "
+        // TX : " . $pd['tx'] . "
+        // RX : " . $pd['rx'] . "
+        // Reason : Tes
+        // Lokasi (map) : https://google.com/maps/place/" . $row->customer->latitude . "," . $row->customer->longitude . "
+        // ";
+        //                         $telegramApi->sendMessage($textReport);
+        //                     }
+        //                 }
+        //             }
+        //         }
     }
 
     public function getDateCustomers()
