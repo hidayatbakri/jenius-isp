@@ -32,6 +32,9 @@ Copy file .env.example kemudian hasil copy tersebut rename menjadi .env
 ```sh
 php artisan key:generate
 ```
+```sh
+php artisan storage:link
+```
 ### Konfigurasi env
 Setalah melakukan instalasi buka file .env kemudian 
 ```sh
@@ -50,7 +53,11 @@ Lanjut di terminal ketikkan :
 ```sh
 php artisan migrate
 ```
-
+### Menjalankan pengecekan status customer
+Pengecekan berkala setiap 1 menit
+```sh
+php artisan schedule:work
+```
 ### Menjalankan server
 ```sh
 php artisan serve
