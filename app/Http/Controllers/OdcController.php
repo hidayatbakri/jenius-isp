@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Odc;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class OdcController extends Controller
 {
@@ -49,7 +50,10 @@ class OdcController extends Controller
      */
     public function show(Odc $odc)
     {
-        //
+        $title = 'Alat | Jenius';
+        $activeLink = 'dashboard';
+        $tool = Odc::with('odp')->where('id', $odc->id)->first();
+        return view('admin.tools.show', compact('title', 'activeLink', 'tool'));
     }
 
     /**
@@ -65,7 +69,23 @@ class OdcController extends Controller
      */
     public function update(Request $request, Odc $odc)
     {
-        //
+        $requestValidate = $request->validate([
+            'name' => 'required',
+            'head' => 'required',
+            'address' => 'required',
+            'description' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+        ]);
+
+        if ($request->foto != null) {
+            Storage::disk()->delete($odc->foto);
+            $requestValidate['foto'] = $request->file('foto')->store('alat');
+        }
+
+        Odc::where('id', $odc->id)->update($requestValidate);
+
+        return redirect()->back()->with('success', 'Berhasil mengubah data');
     }
 
     /**
@@ -73,6 +93,8 @@ class OdcController extends Controller
      */
     public function destroy(Odc $odc)
     {
-        //
+        Odc::where('id', $odc->id)->delete();
+        Storage::disk()->delete($odc->foto);
+        return redirect()->back()->with('success', 'Berhasil menghapus data');
     }
 }

@@ -47,7 +47,7 @@
                 <label for="odp_id">Odp:</label>
                 <select name="odp_id" id="odp_id" class="form-control @error('odp_id') is-invalid @enderror">
                   @foreach($odp as $rowodp)
-                  <option value="{{ $rowodp->id }}">{{ $rowodp->name }}Mbps</option>
+                  <option value="{{ $rowodp->id }}">{{ $rowodp->name }}</option>
                   @endforeach
                 </select>
                 @error('odp_id')

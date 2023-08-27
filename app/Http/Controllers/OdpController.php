@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Odp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +14,8 @@ class OdpController extends Controller
         $title = 'Alat | Jenius';
         $activeLink = 'dashboard';
         $tool = Odp::with('odc')->where('id', $odp->id)->first();
-        return view('admin.tools.show', compact('title', 'activeLink', 'tool'));
+        $customers = Customer::where('odp_id', $odp->id)->get();
+        return view('admin.tools.show', compact('title', 'activeLink', 'tool', 'customers'));
     }
 
     /**
@@ -46,6 +48,8 @@ class OdpController extends Controller
      */
     public function destroy(Odp $odp)
     {
-        //
+        Odp::where('id', $odp->id)->delete();
+        Storage::disk()->delete($odp->foto);
+        return redirect()->back()->with('success', 'Berhasil menghapus data');
     }
 }

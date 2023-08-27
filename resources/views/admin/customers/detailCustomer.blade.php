@@ -88,6 +88,11 @@
                 <td>:</td>
                 <td>{{$customer->sn}}</td>
               </tr>
+              <tr>
+                <td>Odp</td>
+                <td>:</td>
+                <td>{{$odp->name}} <a href="/admin/odp/{{ $odp->id }}" class=""><i class="fas fa-external-link-alt px-1"></i></a></td>
+              </tr>
             </table>
           </div>
         </div>

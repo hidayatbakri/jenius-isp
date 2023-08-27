@@ -71,7 +71,9 @@
 
 <script>
   const data = JSON.parse(@json($tools));
+  const getcustomers = JSON.parse(@json($customers));
   let dataodp = [];
+  let totalcust = [];
   mapboxgl.accessToken =
     "pk.eyJ1IjoibWhtbWRkYXJ5bDExMCIsImEiOiJjbGxsbTJvYXQxcjJsM2xuczFheGhvYnd2In0.snzr5dOuhxwndWXQi8Tfog";
 
@@ -83,6 +85,8 @@
   });
 
   const features = [];
+  let i = 0,
+    j = 0;
   data.forEach(item => {
     const {
       latitude,
@@ -102,6 +106,7 @@
       properties: {
         title: name,
         address: address,
+        totalOdp: odp.length,
         id: id,
       },
     };
@@ -110,8 +115,22 @@
     })
     dataodp.push(odp);
     features.push(geojsonFeature);
+    i++;
   });
 
+  getcustomers.forEach(item => {
+    const {
+      id,
+      customer,
+    } = item;
+    const dataCust = {
+      id: customer.length > 0 ? customer[0].odp_id : 0,
+      totalCustomer: customer.length > 0 ? customer.length : 0,
+    }
+    totalcust.push(dataCust)
+
+    j++;
+  });
 
   const geojson = {
     type: "FeatureCollection",
@@ -121,24 +140,42 @@
   const features2 = [];
   for (let i = 0; i < dataodp.length; i++) {
     if (dataodp[i].length > 1) {
-      let getodp = dataodp[i][0]
-      let getodc = dataodp[i][1]
-      const geojsonFeature2 = {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [parseFloat(getodp.longitude), parseFloat(getodp.latitude)],
-        },
-        properties: {
-          title: getodp.name,
-          address: getodp.address,
-          odc: getodc.odc,
-          id: getodp.id,
-        },
-      };
-      features2.push(geojsonFeature2);
+      for (let j = 0; j < dataodp[i].length - 1; j++) {
+        let getodp = dataodp[i][j]
+        let getodc = dataodp[i][dataodp[i].length - 1]
+        const geojsonFeature2 = {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [parseFloat(getodp.longitude), parseFloat(getodp.latitude)],
+          },
+          properties: {
+            title: getodp.name,
+            address: getodp.address,
+            odc: getodc.odc,
+            id: getodp.id,
+          },
+        };
+
+        features2.push(geojsonFeature2);
+      }
     }
   }
+
+  for (var k = 0; k < features2.length; k++) {
+    var idFound = false;
+    for (var l = 0; l < totalcust.length; l++) {
+      if (totalcust[l].id === features2[k].properties.id) {
+        features2[k].properties.totalCustomer = totalcust[l].totalCustomer;
+        idFound = true;
+        break;
+      }
+    }
+    if (!idFound) {
+      features2[k].properties.totalCustomer = 0;
+    }
+  }
+
 
   const geojson2 = {
     type: "FeatureCollection",
@@ -146,9 +183,7 @@
   };
 
 
-
   for (const feature of geojson.features) {
-    // create a HTML element for each feature
     const el = document.createElement("div");
     el.className = "marker";
 
@@ -163,7 +198,8 @@
           <ul class="list-group list-group-flush ">
             <li class="list-group-item">Nama : ${feature.properties.title}</li>
             <li class="list-group-item">Alamat : ${feature.properties.address}</li>
-            <li class="list-group-item">Detail : <a href="/admin/customers/${feature.properties.id}">Buka <i class="fas fa-external-link-alt px-1"></i></a></li>
+            <li class="list-group-item">Total Odp : ${feature.properties.totalOdp}</li>
+            <li class="list-group-item">Detail : <a href="/admin/odc/${feature.properties.id}">Buka <i class="fas fa-external-link-alt px-1"></i></a></li>
           </ul>
           `
         )
@@ -188,7 +224,8 @@
             <li class="list-group-item">Nama : ${feature2.properties.title}</li>
             <li class="list-group-item">Alamat : ${feature2.properties.address}</li>
             <li class="list-group-item">Odc : ${feature2.properties.odc}</li>
-            <li class="list-group-item">Detail : <a href="/admin/customers/${feature2.properties.id}">Buka <i class="fas fa-external-link-alt px-1"></i></a></li>
+            <li class="list-group-item">Total Pelanggan : ${feature2.properties.totalCustomer}</li>
+            <li class="list-group-item">Detail : <a href="/admin/odp/${feature2.properties.id}">Buka <i class="fas fa-external-link-alt px-1"></i></a></li>
           </ul>
           `
         )

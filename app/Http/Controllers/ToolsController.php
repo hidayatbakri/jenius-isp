@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Odc;
 use App\Models\Odp;
 use App\Models\Tool;
@@ -79,23 +80,6 @@ class ToolsController extends Controller
      */
     public function update(Request $request, Tool $tool)
     {
-        $requestValidate = $request->validate([
-            'name' => 'required',
-            'head' => 'required',
-            'address' => 'required',
-            'description' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
-        ]);
-
-        if ($request->foto != null) {
-            Storage::disk()->delete($tool->foto);
-            $requestValidate['foto'] = $request->file('foto')->store('alat');
-        }
-
-        Tool::where('id', $tool->id)->update($requestValidate);
-
-        return redirect()->back()->with('success', 'Berhasil mengubah data');
     }
 
     /**
@@ -103,8 +87,6 @@ class ToolsController extends Controller
      */
     public function destroy(Tool $tool)
     {
-        Tool::where('id', $tool->id)->delete();
-        return redirect()->back()->with('success', 'Berhasil menghapus data');
     }
 
     public function map()
@@ -113,7 +95,9 @@ class ToolsController extends Controller
         $activeLink = 'dashboard';
         $tools = Odc::with('odp')->get();
         $tools = json_encode($tools);
-        // dd($tools);
-        return view('admin.tools.map', compact('title', 'activeLink', 'tools'));
+        $customers = Odp::with('customer')->get();
+        // dd($customers);
+        $customers = json_encode($customers);
+        return view('admin.tools.map', compact('title', 'activeLink', 'tools', 'customers'));
     }
 }

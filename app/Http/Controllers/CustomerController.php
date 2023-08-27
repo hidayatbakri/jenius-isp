@@ -198,7 +198,8 @@ wan 1 ethuni 1 ssid 1 service internet host 1
             ->rightJoin('paket', 'paket.id', '=', 'customers.paket_id')
             ->where('paket.id', $customer->paket_id)
             ->first();
-        return view('admin.customers.detailCustomer', compact('title', 'activeLink', 'customers', 'customer'));
+        $odp = Odp::where('id', $customer->odp_id)->first();
+        return view('admin.customers.detailCustomer', compact('title', 'activeLink', 'customers', 'customer', 'odp'));
     }
 
     /**
