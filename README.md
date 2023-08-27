@@ -22,34 +22,30 @@ cd /laragon/www
 ```
 Setelah itu:
 ```sh
-git clone https://github.com/hidayatbakri/internet-service.git
-cd internet-service
+git clone https://github.com/hidayatbakri/jenius-isp.git
+cd jenius-isp
 ```
 ```sh
 composer install
-php artisan key:generate
 ```
 Copy file .env.example kemudian hasil copy tersebut rename menjadi .env
+```sh
+php artisan key:generate
+```
+```sh
+php artisan storage:link
+```
 ### Konfigurasi env
 Setalah melakukan instalasi buka file .env kemudian 
 ```sh
-APP_NAME=Laravel            => APP_NAME=internet-service
+APP_NAME=Laravel            => APP_NAME=jenius-isp
 ```
 ```sh             
-DB_DATABASE=laravel         => DB_DATABASE=internet-service
+DB_DATABASE=laravel         => DB_DATABASE=jenius-isp
 ```
 
->> Untuk yang dibawah 👇, minta lewat Whatsapp
-```sh             
-MAIL_MAILER=smtp
-MAIL_HOST=mailpit
-MAIL_PORT=1025
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="hello@example.com"
-MAIL_FROM_NAME="${APP_NAME}"
-```
+>> Untuk konfigurasi env yang lengkap silahkan hubungi admin
+
 
 ### Konfigurasi database 
 Lanjut di terminal ketikkan :
@@ -57,7 +53,11 @@ Lanjut di terminal ketikkan :
 ```sh
 php artisan migrate
 ```
-
+### Menjalankan pengecekan status customer
+Pengecekan berkala setiap 1 menit
+```sh
+php artisan schedule:work
+```
 ### Menjalankan server
 ```sh
 php artisan serve
