@@ -1,5 +1,5 @@
 <div>
-    <table class="table" id="myTable">
+    <table class="table" id="dataTable">
         <thead>
             <tr>
                 <th>No</th>

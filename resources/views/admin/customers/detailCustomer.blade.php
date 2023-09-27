@@ -59,93 +59,113 @@
                     <img class="mt-3 rounded" style="object-fit:cover; width: 300px;" src="/storage/{{ $customer->foto_ktp }}" alt="">
                   </td>
                 </tr>
+                <tr>
+                  <td>Foto Rumah</td>
+                  <td>:</td>
+                  <td>
+                    <img class="mt-3 rounded" style="object-fit:cover; width: 300px;" src="/storage/{{ $customer->foto_rumah }}" alt="">
+                  </td>
+                </tr>
               </table>
+              <div class="d-flex justify-content-end">
+                <a href="/admin" class="btn btn-primary my-3 px-3">Kembali</a>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="card">
-        <div class="card-header">
-          <h4>Detail Olt</h4>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive table-invoice">
-            <table class="table">
-              <tr>
-                <td>Onu</td>
-                <td>:</td>
-                <td>gpon-onu_{{$customer->onu}}</td>
-              </tr>
-              <tr>
-                <td>Tipe</td>
-                <td>:</td>
-                <td>{{$customer->type}}</td>
-              </tr>
-              <tr>
-                <td>Serial Number</td>
-                <td>:</td>
-                <td>{{$customer->sn}}</td>
-              </tr>
-              <tr>
-                <td>Odp</td>
-                <td>:</td>
-                <td>{{$odp->name}} <a href="/admin/odp/{{ $odp->id }}" class=""><i class="fas fa-external-link-alt px-1"></i></a></td>
-              </tr>
-            </table>
           </div>
         </div>
       </div>
     </div>
   </div>
   <div class="col-7 col-sm-12 col-lg-7">
-    <div class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h4>Detail Transaksi</h4>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive table-invoice">
-              <table class="table" id="myTable">
-                <thead>
-                  <th>No</th>
-                  <th>Order Id</th>
-                  <th>Transaction Id</th>
-                  <th>Gross Amount</th>
-                  <th>Payment Type</th>
-                  <th>Payment Link</th>
-                  <th>Status</th>
-                  <th>Tanggal</th>
-                </thead>
-                <tbody>
-                  @foreach($customers as $rowC)
-                  @foreach($rowC->transactions as $tr)
-                  <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $tr->order_id }}</td>
-                    <td>{{ $tr->transaction_id }}</td>
-                    <td>Rp. {{ number_format($tr->gross_amount, 0, ".", ".") }}</td>
-                    <td>{{ $tr->payment_type }}</td>
-                    <td><a href="https://app.sandbox.midtrans.com/payment-links/{{ $tr->paymentlink }}" target="_blank">Buka Situs</a></td>
-                    <td>
-                      @if($tr->status_code == 200)
-                      <div class="badge badge-sm bg-success">Dibayar</div>
-                      @elseif($tr->status_code == 201)
-                      <div class="badge badge-sm bg-warning">Pending</div>
-                      @else
-                      <div class="badge badge-sm bg-secondary">Gagal</div>
-                      @endif
-                    </td>
-                    <td>{{ $tr->updated_at }}</td>
-                  </tr>
-                  @endforeach
-                  @endforeach
-                </tbody>
-              </table>
-            </div>
-          </div>
+    <div class="card">
+      <div class="card-header">
+        <h4>Detail Olt</h4>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive table-invoice">
+          <table class="table">
+            <tr>
+              <td>Onu</td>
+              <td>:</td>
+              <td>{{$profile['onuinterface'] }}</td>
+            </tr>
+            <tr>
+              <td>Tipe</td>
+              <td>:</td>
+              <td>{{$profile['type'] }}</td>
+            </tr>
+            <tr>
+              <td>Serial Number</td>
+              <td>:</td>
+              <td>{{$profile['serialnumber'] }}</td>
+            </tr>
+            <tr>
+              <td>State</td>
+              <td>:</td>
+              <td>{{$profile['state'] }}</td>
+            </tr>
+            <tr>
+              <td>Phase State</td>
+              <td>:</td>
+              <td>{{$profile['phasestate'] }}</td>
+            </tr>
+            <tr>
+              <td>Onu Distance</td>
+              <td>:</td>
+              <td>{{$profile['onudistance'] }}</td>
+            </tr>
+            <tr>
+              <td>Online Duration</td>
+              <td>:</td>
+              <td>{{$profile['onlineduration'] }}</td>
+            </tr>
+            <tr>
+              <td>Odp</td>
+              <td>:</td>
+              <td>{{$odp->name}} <a href="/admin/odp/{{ $odp->id }}" class=""><i class="fas fa-external-link-alt px-1"></i></a></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 col-sm-12 col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <h4>Detail Transaksi</h4>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive table-invoice">
+          <table class="table" id="dataTable">
+            <thead>
+              <th>No</th>
+              <th>Order Id</th>
+              <th>Status</th>
+              <th>Tipe Pembayaran</th>
+              <th>Biaya</th>
+              <th>Tanggal Di Bayar</th>
+              <th>Link</th>
+            </thead>
+            <tbody>
+              @foreach($customers as $customer)
+              @foreach($customer->transactions as $tr)
+              <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $tr->order_id }}</td>
+                <td>{{ $tr->status_code == 200 ? 'Dibayar' : 'Belum Dibayar'}}</td>
+                <td>{{ $tr->payment_type }}</td>
+                <td>Rp. {{ number_format($tr->gross_amount,0, ".", ".") }}</td>
+                <td>{{ $tr->date }}</td>
+                <td><a href="https://app.sandbox.midtrans.com/payment-links/{{ $tr->paymentlink }}" target="_blank">https://app.sandbox.midtrans.com/payment-links/{{ $tr->paymentlink }}</a></td>
+              </tr>
+              @endforeach
+              @endforeach
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Odc;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class OdcController extends Controller
@@ -61,7 +62,15 @@ class OdcController extends Controller
      */
     public function edit(Odc $odc)
     {
-        //
+        $title = 'Alat | Jenius';
+        $activeLink = 'dashboard';
+        $type = 'odc';
+        $response = Http::withToken("9309aa9699e17138af7081fb07d0d9fa:")
+            ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
+            ->get(env('OLT_API_URL') . 'api/gettelnet');
+        $olt = json_decode($response->getBody()->getContents(), true);
+        // $dc = Odc::with('odp')->get();
+        return view('admin.tools.edit', compact('title', 'activeLink', 'type', 'odc', 'olt'));
     }
 
     /**
@@ -70,6 +79,7 @@ class OdcController extends Controller
     public function update(Request $request, Odc $odc)
     {
         $requestValidate = $request->validate([
+            'olt_id' => 'required',
             'name' => 'required',
             'head' => 'required',
             'address' => 'required',
@@ -85,7 +95,7 @@ class OdcController extends Controller
 
         Odc::where('id', $odc->id)->update($requestValidate);
 
-        return redirect()->back()->with('success', 'Berhasil mengubah data');
+        return redirect('/admin/tools')->with('success', 'Berhasil mengubah data');
     }
 
     /**

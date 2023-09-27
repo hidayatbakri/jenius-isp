@@ -7,6 +7,7 @@ use App\Models\Odc;
 use App\Models\Odp;
 use App\Models\Tool;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class ToolsController extends Controller
@@ -18,9 +19,15 @@ class ToolsController extends Controller
     {
         $title = 'Alat | Jenius';
         $activeLink = 'dashboard';
-        $odc = Odc::all();
+        $odc = Odc::with('odp')->get();
+
+        // dd($totalOdc);
         $odp = Odp::with('odc')->get();
-        return view('admin.tools.index', compact('title', 'activeLink', 'odc', 'odp'));
+        $response = Http::withToken("9309aa9699e17138af7081fb07d0d9fa:")
+            ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
+            ->get(env('OLT_API_URL') . 'api/gettelnet');
+        $olt = json_decode($response->getBody()->getContents(), true);
+        return view('admin.tools.index', compact('title', 'activeLink', 'olt',  'odc', 'odp'));
     }
 
     /**
@@ -46,6 +53,8 @@ class ToolsController extends Controller
         ]);
         $requestValidate['foto'] = $request->file('foto')->store('alat');
         if ($request->type == 1) {
+            $requestValidate['olt_id'] = $request->olt_id;
+            $requestValidate['port'] = $request->port;
             Odc::create($requestValidate);
         } elseif ($request->type == 0) {
             $requestValidate['odc_id'] = $request->odp;

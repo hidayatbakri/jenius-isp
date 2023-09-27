@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Odc;
 use App\Models\Odp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+
+use function PHPSTORM_META\type;
 
 class OdpController extends Controller
 {
@@ -16,6 +19,16 @@ class OdpController extends Controller
         $tool = Odp::with('odc')->where('id', $odp->id)->first();
         $customers = Customer::where('odp_id', $odp->id)->get();
         return view('admin.tools.show', compact('title', 'activeLink', 'tool', 'customers'));
+    }
+
+    public function edit(Odp $odp)
+    {
+        $title = 'Alat | Jenius';
+        $activeLink = 'dashboard';
+        $type = 'odp';
+        $odc = Odc::with('odp')->get();
+        $tool = Odp::with('odc')->where('id', $odp->id)->first();
+        return view('admin.tools.edit', compact('title', 'activeLink', 'type', 'odc', 'tool'));
     }
 
     /**
@@ -40,7 +53,7 @@ class OdpController extends Controller
 
         Odp::where('id', $odp->id)->update($requestValidate);
 
-        return redirect()->back()->with('success', 'Berhasil mengubah data');
+        return redirect()->with('success', 'Berhasil mengubah data');
     }
 
     /**

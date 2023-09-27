@@ -14,6 +14,7 @@ class PaymentController extends Controller
 {
     public function index(Request $request)
     {
+        // https://server.smartinovasi.com/api/payment/notif
     }
 
     public function error(Request $request, $order)
@@ -26,6 +27,11 @@ class PaymentController extends Controller
         return view("thanksPay");
     }
 
+    public function mandiriNotif(Request $request)
+    {
+        return 'oke';
+    }
+
     public function notif(Request $request)
     {
         $data = json_decode($request->getContent());
@@ -35,7 +41,7 @@ class PaymentController extends Controller
             'status_code' => $data->status_code,
             'transaction_id' => $data->transaction_id,
             'payment_type' => $data->payment_type,
-            'updated_at' => $data->settlement_time,
+            'date' => $data->settlement_time,
         ]);
 
         $originalDate = $data->settlement_time;
@@ -45,11 +51,17 @@ class PaymentController extends Controller
         $oneMonthLaterFormatted = $oneMonthLater->format('Y-m-d H:i:s');
 
         $transaction = Transaction::where('order_id', $order_id)->first();
-        Customer::where('id', $transaction->customer_id)->update([
-            'active' => $data->settlement_time,
-            'expire' => $oneMonthLaterFormatted
-        ]);
         $customer = Customer::with('paket')->where('id', $transaction->customer_id)->first();
+        if ($customer->active == null) {
+            Customer::where('id', $transaction->customer_id)->update([
+                'active' => $data->settlement_time,
+                'expire' => $oneMonthLaterFormatted
+            ]);
+        } else {
+            Customer::where('id', $transaction->customer_id)->update([
+                'expire' => $oneMonthLaterFormatted
+            ]);
+        }
         $telegramApi = new TelegramApi;
         $textReport = "
 📢 Informasi Pelanggan 📢
@@ -59,7 +71,7 @@ Sn : " . $customer->sn . "
 Telepon : " . $customer->hp . "
 Paket : " . $customer->paket->speed . "
 Bayar : Rp. " . number_format($transaction->gross_amount, 0, '.', '.') . "
-Status : " . $data->status_code == 200 ? 'Dibayar' : '-' . "
+Status : Dibayar
 Lokasi (map) : https://google.com/maps/place/" . $customer->latitude . "," . $customer->longitude . "
         ";
         $telegramApi->sendMessage($textReport);

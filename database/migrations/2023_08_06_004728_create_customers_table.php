@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('olt_id');
+            $table->string('olt_id');
             $table->foreignId('odp_id');
             $table->foreignId('paket_id');
             $table->string('onu')->unique("onu");
@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('hp');
             $table->string('nik');
             $table->string('foto_ktp');
+            $table->string('foto_rumah');
+            $table->string('status_rumah');
             $table->string('address');
             $table->string('latitude');
             $table->string('longitude');

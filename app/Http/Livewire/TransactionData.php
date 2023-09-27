@@ -2,14 +2,20 @@
 
 namespace App\Http\Livewire;
 
+use App\Events\ApiResponseReceived;
+use App\Jobs\TelnetDataRetrievalJob;
 use App\Jobs\TelnetStat;
 use App\Models\Customer;
+use App\Models\CustomerProfile;
 use App\Models\Olt;
 use App\Models\Paket;
 use App\Models\TelegramApi;
 use App\Models\Telnet;
+use App\Models\TelnetCache;
+use App\Models\TelnetSingleton;
 use App\Models\Transaction;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
@@ -17,16 +23,17 @@ use Livewire\Component;
 class TransactionData extends Component
 {
     public $dataPower;
-    public $getactiveolt;
-    public $customers;
-    public $now;
-    public $in = 0;
+    public $customers = [];
+    public $uncfg;
+    public $dbcustomers;
+    public $message;
+    public $results = [];
+
+    protected $listeners = ['getData' => 'getData', 'getPower' => 'getPower', 'getUncfg' => 'getUncfg', 'refresh' => 'refresh'];
     public function mount()
     {
-        $this->getactiveolt = Olt::where('status', 1)->first();
-        $customers = Transaction::with('customer')->where('olt_id', $this->getactiveolt->id ?? 0)->groupBy('customer_id')->get();
-        $this->customers =  $customers;
-        // dd($customers);
+        $this->uncfg = [];
+        $this->message = "Mengambil data...";
     }
 
     public function render()
@@ -34,85 +41,84 @@ class TransactionData extends Component
         return view('livewire.transaction-data');
     }
 
-    protected $listeners = ['getData' => 'getData', 'getPower' => 'getPower'];
 
     public function getData()
     {
-        $customers = Transaction::with('customer')->where('olt_id', $this->getactiveolt->id ?? 0)->groupBy('customer_id')->get();
-        $this->customers =  $customers;
+        // $response = Http::withToken("9309aa9699e17138af7081fb07d0d9fa:")
+        //     ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
+        //     ->get(env('OLT_API_URL') . 'api/olt/profiles');
+        // $profiles = json_decode($response->getBody()->getContents(), true);
+        // if (isset($profiles['message'])) {
+        //     $this->customers = [];
+        //     dump($profiles['message']);
+        //     $this->message = "Data Kosong";
+        // } else {
+        //     if ($profiles != null) {
+        //         $this->message = null;
+        //         $this->customers = $profiles;
+        //     }
+        // }
+
+        $responseOlt = Http::withToken("9309aa9699e17138af7081fb07d0d9fa:")
+            ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
+            ->get(env('OLT_API_URL') . 'api/olt/getconnect');
+        $olt = json_decode($responseOlt->getBody()->getContents(), true);
+        $this->customers = CustomerProfile::where('olt_id', $olt['id'])->get();
+
+        $this->dbcustomers = Customer::all();
+
+        foreach ($this->customers ?? [] as $key => $data1) {
+            $found = false;
+            foreach ($this->dbcustomers ?? [] as $data2) {
+                if (isset($data1["onuinterface"])) {
+                    if ($data1["onuinterface"] == $data2->onu) {
+                        $found = true;
+                        $this->results[$data1->onuinterface]['id'] = $data2->id;
+                        $this->results[$data1->onuinterface]['exp'] = $data2->expire;
+                        break;
+                    }
+                }
+            }
+            $this->results[$data1->onuinterface]['status'] = $found;
+        }
+        $this->emit('refreshProfiles');
     }
 
     public function getPower()
     {
-        // dd('asdf');
-        $getactiveolt = Olt::where('status', 1)->first();
-        $telnet = new Telnet();
-        if ($getactiveolt != null) {
-            $result = $telnet->Connect($getactiveolt->host, $getactiveolt->user, $getactiveolt->password, $getactiveolt->port);
-            if ($result == 0) {
-                $dataOlt = $telnet->getPowerFromArrayOfData($this->customers);
-                $telnet->Disconnect();
-                $data =  $dataOlt;
-            }
-        }
-        $this->dataPower = $data;
+        $response = Http::withToken("9309aa9699e17138af7081fb07d0d9fa:")
+            ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
+            ->get(env('OLT_API_URL') . 'api/olt/powers');
+        $powers = json_decode($response->getBody()->getContents(), true);
+        // dd($powers);
 
-        // $textReport = '';
-        //         $telegramApi = new TelegramApi;
-        //         foreach ($this->customers as $row) {
-        //             if (isset($data[$row->customer->onu]) != null) {
-        //                 foreach ($data[$row->customer->onu] as $pd) {
-        //                     if ($pd['tx'] > 6.980 || $pd['rx'] < -13.224) {
-        //                         $textReport = "
-        // ⚠Informasi Gangguan⚠
-        // Nama Pelanggan : " . $row->customer->name . "
-        // Onu : " . $row->customer->onu . "
-        // Olt : " . $getactiveolt->name . "
-        // Sn : " . $row->customer->sn . "
-        // Telepon : " . $row->customer->hp . "
-        // TX : " . $pd['tx'] . "
-        // RX : " . $pd['rx'] . "
-        // Reason : Tes
-        // Lokasi (map) : https://google.com/maps/place/" . $row->customer->latitude . "," . $row->customer->longitude . "
-        // ";
-        //                         $telegramApi->sendMessage($textReport);
-        //                     }
-        //                 }
-        //             }
-        //         }
+        if (isset($powers['message'])) {
+            $this->dataPower = [];
+        } else {
+            $this->dataPower = $powers;
+        }
+        $this->emit('refreshPowers');
     }
 
-    public function getDateCustomers()
+    public function getUncfg()
     {
-        $this->now = Carbon::today()->format("Y-m-d");
-        foreach ($this->customers as $row) {
-            if ($row->customer->expire <= $this->now && $row->customer->expire != null) {
-                $paket = Paket::where('id', $row->customer->paket)->first();
-                $paymentLinkId =  preg_replace("/[^a-zA-Z0-9]/", '', base64_encode($row->customer->email . $row->customer->hp . rand(10, 9999999999)));
-                $orderId = rand(1000, 1000000000000);
-                $biayaAdmin = DB::table('transactionsettings')->first();
-                $totalBiaya = $paket->price + $biayaAdmin->biaya_admin ?? 0;
-                $response = Http::withBasicAuth("SB-Mid-server-m9r2dUIe58EggFEyTflF8orC:", "")
-                    ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
-                    ->withBody('{"transaction_details":{"order_id":"' . $orderId . '","gross_amount":' . $totalBiaya . ',"payment_link_id":"' . $paymentLinkId . '"},"credit_card":{"secure":true},"usage_limit":999,"expiry":{"duration":1,"unit":"days"},"item_details":[{"id":' . $paket->id . ',"name": "' . $paket->speed . 'mbps","price":' . $totalBiaya . ',"quantity":1}],"customer_details":{"first_name":"' . $row->customer->name . '","last_name":"","email":"' . $row->customer->email . '","phone":"' . $row->customer->hp . '","notes":"Terimakasih telah bertransaksi, selesaikan pembayaran untuk berlangganan."}}')
-                    ->post('https://api.sandbox.midtrans.com/v1/payment-links');
-                Transaction::create([
-                    'customer_id' => $row->customer->id,
-                    'status_code' => 201,
-                    'transaction_id' => '',
-                    'order_id' => $orderId,
-                    'gross_amount' => $paket->price,
-                    'payment_type' => '',
-                    'transaction_code' => '',
-                    'paymentlink' => $paymentLinkId,
-                ]);
-
-
-                Customer::where('id', $row->customer->id)->update([
-                    'active' => null,
-                    'expire' => null,
-                ]);
-            }
+        $response = Http::withToken("9309aa9699e17138af7081fb07d0d9fa:")
+            ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
+            ->get(env('OLT_API_URL') . 'api/olt/uncfg');
+        $uncfg = json_decode($response->getBody()->getContents(), true);
+        // dd($uncfg);
+        if (isset($uncfg['message'])) {
+            $this->uncfg = [];
+        } else {
+            $this->message = null;
+            $this->uncfg = $uncfg;
         }
+        $this->emit('refreshUncfg');
+    }
+
+    public function refresh()
+    {
+        $cp = new CustomerProfile();
+        $cp->refresh();
     }
 }

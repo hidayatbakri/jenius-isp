@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MandiriApi;
 use App\Models\Paket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,12 @@ class SettingsController extends Controller
         $transactionSettings = DB::table('transactionsettings')->first();
         // dd($transactionSettings);
         return view('admin.settings.transaction', compact('title', 'activeLink', 'transactionSettings', 'paket'));
+    }
+
+    public function bank()
+    {
+        $mandiri = new MandiriApi();
+        dd($mandiri->auth());
     }
 
     public function transactionCreate(Request $request)

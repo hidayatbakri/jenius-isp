@@ -211,17 +211,15 @@
               <ul class="dropdown-menu">
                 <li><a class="nav-link" href="/admin">Pelanggan</a></li>
                 <li><a class="nav-link" href="/admin/olt">OLT</a></li>
-                <li><a class="nav-link" href="/admin/listonu">Pendaftaran</a></li>
                 <li><a class="nav-link" href="/admin/tools">Alat</a></li>
-                <!-- <li><a class="nav-link" href="/admin/pendaftaran">Pendaftaran</a></li> -->
               </ul>
             </li>
             <li class="dropdown {{ $activeLink == 'settings' ? 'active' : '' }}">
               <a href="#" class="nav-link has-dropdown"><i class="fas fa-cog"></i><span>Pengaturan</span></a>
               <ul class="dropdown-menu">
+                <li><a class="nav-link" href="/admin/settings/bank">Bank</a></li>
                 <li><a class="nav-link" href="/admin/settings/transaction">Transaksi</a></li>
-                <li><a class="nav-link" href="/admin/settings/account">Akun</a></li>
-                <!-- <li><a class="nav-link" href="/admin/pendaftaran">Pendaftaran</a></li> -->
+                <li><a class="nav-link" href="/admin/profile">Akun</a></li>
               </ul>
             </li>
             <li class="menu-header">Lainnya</li>

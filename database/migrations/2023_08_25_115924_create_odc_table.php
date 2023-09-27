@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('odc', function (Blueprint $table) {
             $table->id();
+            $table->string("olt_id");
             $table->string("name");
             $table->string("head");
             $table->string("address");
             $table->string("description");
             $table->string("foto");
+            $table->integer("port");
             $table->string("latitude");
             $table->string("longitude");
             $table->timestamps();

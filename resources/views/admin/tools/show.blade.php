@@ -10,24 +10,32 @@
 </nav>
 
 <div class="row">
-  <div class="col-5 col-sm-5 col-lg-5">
+  <div class="col-12 col-sm-12 col-lg-12">
     <div class="card">
       <div class="card-header">
         <h4>Detail Alat</h4>
       </div>
       <div class="card-body">
-        <img src="{{ asset('storage/' . $tool->foto) }}" style="max-width: 300px; object-fit: cover;" class="rounded">
-        <ul class="list-group list-group-flush mt-3">
-          <li class="list-group-item"><b>Nama</b> : {{ $tool->name }}</li>
-          <li class="list-group-item"><b>Head</b> : {{ $tool->head }}</li>
-          <li class="list-group-item"><b>Address</b> : {{ $tool->address }}</li>
-          @if(isset($tool->odc_id))
-          <li class="list-group-item"><b>Odc (Connect to)</b> : {{ $tool->odc->name }}</li>
-          @endif
-          <li class="list-group-item"><b>Description</b> : {{ $tool->description }}</li>
-          <li class="list-group-item"><b>Map</b> : <td>Buka <a target="_blank" href="https://google.com/maps/place/{{ $tool->latitude }},{{ $tool->longitude }}"><i class="fas fa-external-link-alt px-1"></i></a></td>
-          </li>
-        </ul>
+        <div class="row">
+          <div class="col-md-4 col-sm-12">
+            <img src="{{ asset('storage/' . $tool->foto) }}" style="max-width: 300px; object-fit: cover;" class="rounded">
+          </div>
+          <div class="col-md-8 col-sm-12">
+            <ul class="list-group list-group-flush mt-3">
+              <li class="list-group-item"><b>Nama</b> : {{ $tool->name }}</li>
+              <li class="list-group-item"><b>Head</b> : {{ $tool->head }}</li>
+              <li class="list-group-item"><b>Alamat</b> : {{ $tool->address }}</li>
+              @if(isset($tool->odc_id))
+              <li class="list-group-item"><b>Odc (Connect to)</b> : {{ $tool->odc->name }}</li>
+              @else
+              <li class="list-group-item"><b>Port</b> : {{count($tool->odp)}}/{{ $tool->port }}</li>
+              @endif
+              <li class="list-group-item"><b>Deskripsi</b> : {{ $tool->description }}</li>
+              <li class="list-group-item"><b>Map</b> : <td>Buka <a target="_blank" href="https://google.com/maps/place/{{ $tool->latitude }},{{ $tool->longitude }}"><i class="fas fa-external-link-alt px-1"></i></a></td>
+              </li>
+            </ul>
+          </div>
+        </div>
         <div class="d-flex justify-content-end mt-3">
           <a href="/admin/tools" class="btn btn-primary">Kembali</a>
         </div>
@@ -35,7 +43,7 @@
     </div>
   </div>
   @if(isset($tool->odp))
-  <div class="col-7 col-sm-7 col-lg-7">
+  <div class="col-12 col-sm-12 col-lg-12">
     <div class="card">
       <div class="card-header">
         <h4>Alat Odp</h4>
@@ -78,10 +86,10 @@
   </div>
   @endif
   @if(isset($customers))
-  <div class="col-7 col-sm-7 col-lg-7">
+  <div class="col-12 col-sm-12 col-lg-12">
     <div class="card">
       <div class="card-header">
-        <h4>Alat Odp</h4>
+        <h4>Daftar Onu</h4>
       </div>
       <div class="card-body">
         <div class="table-responsive table-invoice">

@@ -169,35 +169,35 @@ class Telnet extends Model
         return $output;
     }
 
-    public function parseOutput($output)
-    {
-        $lines = explode("\n", $output);
-        $data = [];
-        $headers = [];
-        $separator = str_repeat('-', strlen(trim($lines[1])));
+    // public function parseOutput($output)
+    // {
+    //     $lines = explode("\n", $output);
+    //     $data = [];
+    //     $headers = [];
+    //     $separator = str_repeat('-', strlen(trim($lines[1])));
 
-        // Process headers
-        $headerLine = trim($lines[0]);
-        $headerValues = preg_split('/\s+/', $headerLine);
-        foreach ($headerValues as $headerValue) {
-            $headers[] = $headerValue;
-        }
+    //     // Process headers
+    //     $headerLine = trim($lines[0]);
+    //     $headerValues = preg_split('/\s+/', $headerLine);
+    //     foreach ($headerValues as $headerValue) {
+    //         $headers[] = $headerValue;
+    //     }
 
-        // Process data rows
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line !== $separator && $line !== $headerLine && !empty($line)) {
-                $values = preg_split('/\s+/', $line);
-                $row = [];
-                for ($i = 0; $i < count($headers); $i++) {
-                    $row[$headers[$i]] = $values[$i];
-                }
-                $data[] = $row;
-            }
-        }
+    //     // Process data rows
+    //     foreach ($lines as $line) {
+    //         $line = trim($line);
+    //         if ($line !== $separator && $line !== $headerLine && !empty($line)) {
+    //             $values = preg_split('/\s+/', $line);
+    //             $row = [];
+    //             for ($i = 0; $i < count($headers); $i++) {
+    //                 $row[$headers[$i]] = $values[$i];
+    //             }
+    //             $data[] = $row;
+    //         }
+    //     }
 
-        return $data;
-    }
+    //     return $data;
+    // }
 
     public static function processOutput($output)
     {
@@ -246,9 +246,9 @@ class Telnet extends Model
     {
         $result = [];
         foreach ($dataArray as $data) {
-            $commandResult = $this->runCommand("show pon power attenuation gpon-onu_" . $data->customer->onu);
+            $commandResult = $this->runCommand("show pon power attenuation " . $data['onuinterface']);
             $powerData = $this->parsePowerData($commandResult);
-            $result[$data->customer->onu] = $powerData;
+            $result[$data['onuinterface']] = $powerData;
         }
         return $result;
     }
@@ -260,14 +260,6 @@ class Telnet extends Model
         $powerData = [];
 
         foreach ($lines as $line) {
-            // if (preg_match('/up\s+Rx :([0-9.-]+)\(dbm\)\s+Tx:([0-9.-]+)\(dbm\)\s+([0-9.-]+)\(dB\)/', $line, $matches)) {
-            //     $powerData[] = [
-            //         'direction' => 'up',
-            //         'rx' => $matches[1],
-            //         'tx' => $matches[2],
-            //         'attenuation' => $matches[3]
-            //     ];
-            // } else
             if (preg_match('/down\s+Tx :([0-9.-]+)\(dbm\)\s+Rx:([0-9.-]+)\(dbm\)\s+([0-9.-]+)\(dB\)/', $line, $matches)) {
                 $powerData[] = [
                     'direction' => 'down',
@@ -280,6 +272,14 @@ class Telnet extends Model
 
         return $powerData;
     }
+    // if (preg_match('/up\s+Rx :([0-9.-]+)\(dbm\)\s+Tx:([0-9.-]+)\(dbm\)\s+([0-9.-]+)\(dB\)/', $line, $matches)) {
+    //     $powerData[] = [
+    //         'direction' => 'up',
+    //         'rx' => $matches[1],
+    //         'tx' => $matches[2],
+    //         'attenuation' => $matches[3]
+    //     ];
+    // } else
 
 
     public static function getPower($data)
@@ -347,5 +347,31 @@ class Telnet extends Model
         }
         // dd($availablePort);
         return $availablePort;
+    }
+
+    public static function processOutputProfile($data)
+    {
+        $entries = explode('@Rdp#', $data);
+        $result = [];
+
+        foreach ($entries as $entry) {
+            $lines = explode("\n", trim($entry));
+            $entryData = [];
+
+            foreach ($lines as $line) {
+                if (preg_match('/^\s*([^:]+):\s*(.*)$/', $line, $matches)) {
+                    $key = str_replace(' ', '', strtolower($matches[1]));
+                    $value = trim($matches[2]);
+                    $entryData[$key] = $value;
+                }
+            }
+
+            if (!empty($entryData)) {
+                $result[] = $entryData;
+            }
+        }
+
+
+        return $result;
     }
 }

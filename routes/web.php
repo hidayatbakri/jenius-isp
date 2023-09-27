@@ -39,9 +39,15 @@ Route::get('/logout', [AuthController::class, 'logout'])->middleware('auth');
 Route::middleware(['checkLevel:admin'])->group(function () {
   Route::get('/admin', [CustomerController::class, 'index']);
   Route::get('/home', [AdminController::class, 'index']);
+  Route::resource('/admin/profile', AdminController::class);
   Route::resource('/admin/router', RouterController::class);
   Route::get('/admin/customers/map', [CustomerController::class, 'map']);
+  Route::get('/admin/customers/refresh', [CustomerController::class, 'refresh']);
+  Route::post('/admin/customers/configure', [CustomerController::class, 'configure']);
+  Route::post('/admin/customers/postConfigure', [CustomerController::class, 'postConfigure']);
+  Route::delete('/admin/customers/{id}', [CustomerController::class, 'destroy']);
   Route::resource('/admin/customers', CustomerController::class);
+  Route::get('/admin/olt/disconnect', [OltController::class, 'disconnect']);
   Route::resource('/admin/olt', OltController::class);
   Route::get('/admin/tools/map', [ToolsController::class, 'map']);
   Route::resource('/admin/tools', ToolsController::class);
@@ -51,11 +57,13 @@ Route::middleware(['checkLevel:admin'])->group(function () {
 
   // Route onu
   Route::get('/admin/listonu', [OltController::class, 'listonu']);
+  Route::get('/admin/onu/comm/reboot', [OltController::class, 'reboot']);
 
   // Router menu
   Route::get('/admin/routerMenu/ipaddress/{router}', [RouterController::class, 'address']);
 
   // Route settings
+  Route::get('/admin/settings/bank', [SettingsController::class, 'bank']);
   Route::get('/admin/settings/transaction', [SettingsController::class, 'transaction']);
   Route::post('/admin/settings/transaction', [SettingsController::class, 'transactionCreate']);
   Route::post('/admin/settings/transaction/{id}', [SettingsController::class, 'transactionUpdate']);

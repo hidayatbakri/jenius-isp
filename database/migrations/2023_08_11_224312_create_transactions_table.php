@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('olt_id');
+            $table->string('olt_id');
             $table->foreignId('customer_id');
             $table->string('status_code');
             $table->string('transaction_id')->nullable();
@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('payment_type')->nullable();
             $table->string('transaction_code')->nullable();
             $table->string('paymentlink');
+            $table->timestamp('date')->nullable();
             $table->timestamps();
         });
     }

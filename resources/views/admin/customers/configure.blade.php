@@ -1,43 +1,33 @@
 @extends('admin.template.dashboard')
 @section('container')
 
+<style>
+  .not-allowed::after {
+    content: ' -';
+    color: red;
+  }
+</style>
+
 <div class="row mt-5">
   <div class="col-12 col-sm-12 col-lg-12">
+    <div class="">
+      <p>Tanda ( <span class="not-allowed"></span> ) tidak perlu di ubah/isi</p>
+    </div>
     <div class="card">
       <div class="card-header">
         <h4>Project Details</h4>
       </div>
       <div class="card-body">
-        <form action="/admin/customers" method="post" enctype="multipart/form-data">
+        <form action="/admin/customers/postConfigure" method="post" enctype="multipart/form-data">
           @csrf
           @method('post')
           <div class="row">
             <div class="col-md-6 col-sm-12">
               <div class="form-group">
-                <label for="onu">Onu:</label>
-                <input type="text" class="form-control @error('onu') is-invalid @enderror" name="onu" id="onu" value="{{ old('onu') ?? $availablePort }}">
-                @error('onu')
-                <div id="validationServer04Feedback" class="invalid-feedback">
-                  {{$message}}
-                </div>
-                @enderror
-              </div>
-              <div class="form-group">
-                <label for="type">Serial Number:</label>
-                <input type="text" class=" form-control @error('sn') is-invalid @enderror" name="sn" id="sn" value="{{ $sn }}">
-                @error('sn')
-                <div id="validationServer04Feedback" class="invalid-feedback">
-                  {{$message}}
-                </div>
-                @enderror
-              </div>
-              <div class="form-group">
-                <label for="type">Type:</label>
-                <select name="type" id="type" class="form-control">
-                  <option value="ZTEG-F609">ZTEG-F609</option>
-                </select>
-                <!-- <input type="text" class="form-control @error('type') is-invalid @enderror" name="type" id="type" value="{{ old('type') }}"> -->
-                @error('type')
+                <label class="not-allowed" for="onuinterface">Onu:</label>
+                <input type="text" disabled class="form-control @error('onuinterface') is-invalid @enderror" value="{{ $profile['onuinterface'] }}">
+                <input type="hidden" class="form-control @error('onuinterface') is-invalid @enderror" name="onuinterface" id="onuinterface" value="{{ $profile['onuinterface'] }}">
+                @error('onuinterface')
                 <div id="validationServer04Feedback" class="invalid-feedback">
                   {{$message}}
                 </div>
@@ -57,46 +47,6 @@
                 @enderror
               </div>
               <div class="form-group">
-                <label for="name">Username:</label>
-                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" value="{{ old('name') }}">
-                @error('name')
-                <div id="validationServer04Feedback" class="invalid-feedback">
-                  {{$message}}
-                </div>
-                @enderror
-              </div>
-              <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" value="{{ old('password') }}">
-                @error('password')
-                <div id="validationServer04Feedback" class="invalid-feedback">
-                  {{$message}}
-                </div>
-                @enderror
-                <div class="form-group mt-2">
-                  <input type="checkbox" id="showPass">
-                  <label for="showPass"> Tampilkan password</label>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="vlan">Vlan:</label>
-                <input type="number" class="form-control @error('vlan') is-invalid @enderror" name="vlan" id="vlan" value="{{ old('vlan') }}">
-                @error('vlan')
-                <div id="validationServer04Feedback" class="invalid-feedback">
-                  {{$message}}
-                </div>
-                @enderror
-              </div>
-              <div class="form-group">
-                <label for="vlanprofile">Vlan Profile:</label>
-                <input type="text" class="form-control @error('vlanprofile') is-invalid @enderror" name="vlanprofile" id="vlanprofile" value="{{ old('vlanprofile') }}">
-                @error('vlanprofile')
-                <div id="validationServer04Feedback" class="invalid-feedback">
-                  {{$message}}
-                </div>
-                @enderror
-              </div>
-              <div class="form-group">
                 <label for="paket_id">Paket:</label>
                 <select name="paket_id" id="paket_id" class="form-control">
                   @foreach($paket as $pkt)
@@ -109,8 +59,6 @@
                 </div>
                 @enderror
               </div>
-            </div>
-            <div class="col-md-6 col-sm-12">
               <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="email" value="{{ old('email') }}">
@@ -138,6 +86,8 @@
                 </div>
                 @enderror
               </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
               <div class="form-group">
                 <label for="foto_ktp">Foto Ktp:</label>
                 <input type="file" class="form-control @error('foto_ktp') is-invalid @enderror" name="foto_ktp" id="foto_ktp">
@@ -219,12 +169,7 @@
 <script>
   $('#name').on('keyup', function(e) {
     let cleanedString = $(this).val().replace(/[^a-zA-Z0-9]/g, '');
-    $('#password').val(cleanedString.toLowerCase() + $('#sn').val());
-  })
-
-  $('#name').on('ready', function(e) {
-    let cleanedString = $(this).val().replace(/[^a-zA-Z0-9]/g, '');
-    $('#password').val(cleanedString.toLowerCase() + $('#sn').val());
+    $('#password').val(cleanedString.toLowerCase() + $('#serialnumber').val());
   })
 
   $('#showPass').on('click', function() {

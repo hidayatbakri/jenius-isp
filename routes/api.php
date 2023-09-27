@@ -21,3 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/payment/notif', [PaymentController::class, 'notif']);
+Route::post('/mandiri/notif', [PaymentController::class, 'mandiriNotif']);
